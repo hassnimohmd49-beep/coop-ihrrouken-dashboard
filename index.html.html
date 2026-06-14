@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة تتبع خدمات التعاونية</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-dark: #1a4a2e;
+    --green: #2d7a4f;
+    --green-light: #4aaa70;
+    --green-pale: #e8f5ee;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-pale: #fdf8ec;
+    --red: #c0392b;
+    --red-pale: #fdf0ee;
+    --blue: #1a6b8a;
+    --blue-pale: #e8f4f8;
+    --gray-100: #f5f6f7;
+    --gray-200: #e8eaed;
+    --gray-400: #9aa0a8;
+    --gray-700: #3c4043;
+    --white: #ffffff;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, var(--green-dark) 0%, var(--green) 60%, var(--green-light) 100%);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    max-width: 1400px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-icon {
+    width: 44px; height: 44px;
+    background: var(--gold);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .header-title h1 {
+    font-size: 17px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+  }
+  .header-title p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 300;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-date {
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.12);
+    padding: 6px 14px;
+    border-radius: 20px;
+  }
+  .sync-btn {
+    font-size: 13px;
+    color: var(--green-dark);
+    background: var(--gold);
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    display: flex; align-items: center; gap: 6px;
+    transition: transform 0.15s;
+  }
+  .sync-btn:hover { transform: scale(1.04); }
+  .sync-btn.loading .sync-icon { animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* SHARED NOTICE */
+  .shared-notice {
+    background: var(--gold-pale);
+    border-bottom: 1px solid var(--gold-light);
+    color: #8a6a1a;
+    font-size: 12px;
+    text-align: center;
+    padding: 7px 10px;
+  }
+
+  /* TABS */
+  .tabs {
+    background: white;
+    border-bottom: 2px solid var(--gray-200);
+    display: flex;
+    gap: 0;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 28px;
+    overflow-x: auto;
+  }
+  .tab-btn {
+    padding: 14px 22px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-400);
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    margin-bottom: -2px;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .tab-btn:hover { color: var(--green); }
+  .tab-btn.active {
+    color: var(--green-dark);
+    border-bottom-color: var(--gold);
+  }
+
+  /* MAIN */
+  .main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 28px;
+  }
+
+  /* SECTION */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .kpi-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border-right: 4px solid;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: -20px; left: -20px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    opacity: 0.07;
+  }
+  .kpi-card.green { border-right-color: var(--green); }
+  .kpi-card.green::before { background: var(--green); }
+  .kpi-card.gold { border-right-color: var(--gold); }
+  .kpi-card.gold::before { background: var(--gold); }
+  .kpi-card.red { border-right-color: var(--red); }
+  .kpi-card.red::before { background: var(--red); }
+  .kpi-card.blue { border-right-color: var(--blue); }
+  .kpi-card.blue::before { background: var(--blue); }
+
+  .kpi-label { font-size: 12px; color: var(--gray-400); font-weight: 500; margin-bottom: 8px; }
+  .kpi-value { font-size: 26px; font-weight: 900; line-height: 1; }
+  .kpi-card.green .kpi-value { color: var(--green); }
+  .kpi-card.gold .kpi-value { color: var(--gold); }
+  .kpi-card.red .kpi-value { color: var(--red); }
+  .kpi-card.blue .kpi-value { color: var(--blue); }
+  .kpi-sub { font-size: 11px; color: var(--gray-400); margin-top: 6px; }
+  .kpi-icon { font-size: 28px; position: absolute; top: 16px; left: 16px; opacity: 0.15; }
+
+  /* PANELS */
+  .panel {
+    background: white;
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--gray-200);
+    background: linear-gradient(135deg, var(--green-pale), white);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .panel-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--green-dark);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-green { background: var(--green); color: white; }
+  .btn-green:hover { background: var(--green-dark); }
+  .btn-gold { background: var(--gold); color: white; }
+  .btn-gold:hover { background: #a8863a; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-red { background: var(--red-pale); color: var(--red); border: 1px solid #f5c6c0; }
+  .btn-red:hover { background: var(--red); color: white; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead { background: var(--gray-100); }
+  th {
+    padding: 11px 14px;
+    text-align: right;
+    font-weight: 700;
+    color: var(--green-dark);
+    font-size: 12px;
+    border-bottom: 2px solid var(--gray-200);
+    white-space: nowrap;
+  }
+  td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--green-pale); }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .badge-green { background: var(--green-pale); color: var(--green); }
+  .badge-gold { background: var(--gold-pale); color: #8a6a1a; }
+  .badge-red { background: var(--red-pale); color: var(--red); }
+  .badge-blue { background: var(--blue-pale); color: var(--blue); }
+
+  /* FORM */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    padding: 20px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group label { font-size: 12px; font-weight: 700; color: var(--green-dark); }
+  .form-group input, .form-group select, .form-group textarea {
+    padding: 9px 12px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 8px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 13px;
+    color: var(--gray-700);
+    transition: border-color 0.2s;
+    background: white;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--green);
+  }
+  .form-actions { padding: 0 20px 20px; display: flex; gap: 10px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 16px;
+    width: 90%; max-width: 620px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 22px;
+    background: linear-gradient(135deg, var(--green-dark), var(--green));
+    color: white;
+    border-radius: 16px 16px 0 0;
+  }
+  .modal-title { font-size: 16px; font-weight: 700; }
+  .modal-close {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.35); }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 0;
+    background: var(--green-dark);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .stat-item {
+    flex: 1;
+    padding: 16px;
+    text-align: center;
+    border-left: 1px solid rgba(255,255,255,0.1);
+  }
+  .stat-item:last-child { border-left: none; }
+  .stat-item .s-val { font-size: 22px; font-weight: 900; color: var(--gold); }
+  .stat-item .s-lbl { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 3px; }
+
+  /* PROGRESS */
+  .progress-wrap { padding: 0 20px 20px; }
+  .prog-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .prog-label { font-size: 12px; font-weight: 600; min-width: 120px; color: var(--gray-700); }
+  .prog-bar { flex: 1; height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+  .prog-val { font-size: 12px; font-weight: 700; min-width: 60px; text-align: left; }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--gray-400);
+  }
+  .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+
+  /* LOADING OVERLAY */
+  #loadingOverlay {
+    position: fixed; inset: 0;
+    background: rgba(255,255,255,0.92);
+    z-index: 2000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px;
+  }
+  .loader-spin {
+    width: 46px; height: 46px;
+    border: 4px solid var(--green-pale);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  #loadingOverlay p { color: var(--green-dark); font-weight: 700; font-size: 14px; }
+
+  /* TOAST */
+  #toast {
+    position: fixed;
+    bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--green-dark);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+    z-index: 3000;
+    transition: transform 0.3s ease;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .main { padding: 16px; }
+    .header-inner { padding: 12px 16px; }
+    .tabs { padding: 0 16px; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+    .stats-bar { flex-wrap: wrap; }
+    .stat-item { min-width: 45%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay">
+  <div class="loader-spin"></div>
+  <p>جاري تحميل بيانات التعاونية...</p>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="header-logo">
+      <div class="logo-icon">🌿</div>
+      <div class="header-title">
+        <h1>تعاونية إحروقن</h1>
+        <p>لوحة تتبع الخدمات والمالية - مشتركة بين الأعضاء</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-date" id="headerDate"></div>
+      <button class="sync-btn" id="syncBtn" onclick="manualSync()">
+        <span class="sync-icon">🔄</span> <span id="syncLabel">تحديث</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="shared-notice">
+  ⚠️ هاد البيانات مشتركة بين جميع الأعضاء اللي عندهم هاد الرابط — كل تعديل كيبان للجميع. اضغط "تحديث" باش تشوف آخر التغييرات.
+</div>
+
+<!-- TABS -->
+<div style="background:white; border-bottom:2px solid var(--gray-200);">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('overview')">📊 نظرة عامة</button>
+    <button class="tab-btn" onclick="showTab('services')">🚜 الخدمات</button>
+    <button class="tab-btn" onclick="showTab('income')">💰 المداخيل</button>
+    <button class="tab-btn" onclick="showTab('expenses')">📋 المصاريف</button>
+    <button class="tab-btn" onclick="showTab('members')">👥 الأعضاء</button>
+    <button class="tab-btn" onclick="showTab('equipment')">⚙️ المعدات</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ========== OVERVIEW ========== -->
+  <div class="section active" id="sec-overview">
+    <div class="kpi-grid">
+      <div class="kpi-card green">
+        <div class="kpi-label">إجمالي المداخيل</div>
+        <div class="kpi-value" id="kpi-income">0</div>
+        <div class="kpi-sub">درهم مغربي</div>
+        <div class="kpi-icon">💰</div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-label">إجمالي المصاريف</div>
+        <div class="kpi-value" id="kpi-expenses">0</div>
+        <div class="kpi-sub">درهم مغربي</div>
+        <div class="kpi-icon">📤</div>
+      </div>
+      <div class="kpi-card gold">
+        <div class="kpi-label">الرصيد الصافي</div>
+        <div class="kpi-value" id="kpi-balance">0</div>
+        <div class="kpi-sub">درهم مغربي</div>
+        <div class="kpi-icon">🏦</div>
+      </div>
+      <div class="kpi-card blue">
+        <div class="kpi-label">الخدمات المنجزة</div>
+        <div class="kpi-value" id="kpi-services">0</div>
+        <div class="kpi-sub">عملية هذه السنة</div>
+        <div class="kpi-icon">🚜</div>
+      </div>
+    </div>
+
+    <!-- SUMMARY BARS -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="s-val" id="stat-month-income">0</div>
+        <div class="s-lbl">مداخيل هذا الشهر (درهم)</div>
+      </div>
+      <div class="stat-item">
+        <div class="s-val" id="stat-month-exp">0</div>
+        <div class="s-lbl">مصاريف هذا الشهر (درهم)</div>
+      </div>
+      <div class="stat-item">
+        <div class="s-val" id="stat-pending">0</div>
+        <div class="s-lbl">خدمات معلقة</div>
+      </div>
+      <div class="stat-item">
+        <div class="s-val" id="stat-members">10</div>
+        <div class="s-lbl">عدد الأعضاء</div>
+      </div>
+    </div>
+
+    <!-- RECENT ACTIVITY -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">🕐 آخر العمليات</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>النوع</th>
+              <th>الوصف</th>
+              <th>المبلغ (درهم)</th>
+              <th>الحالة</th>
+            </tr>
+          </thead>
+          <tbody id="recentTable">
+            <tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📋</div><p>لا توجد عمليات بعد. ابدأ بإضافة خدمة أو عملية مالية.</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CATEGORY BREAKDOWN -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">📊 توزيع المصاريف حسب الفئة</div>
+      </div>
+      <div class="progress-wrap" id="expenseBreakdown">
+        <div class="empty-state"><div class="empty-icon">📊</div><p>أضف مصاريف لعرض التوزيع</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SERVICES ========== -->
+  <div class="section" id="sec-services">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">🚜 سجل الخدمات الفلاحية</div>
+        <button class="btn btn-green" onclick="openModal('modalService')">＋ إضافة خدمة</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>التاريخ</th>
+              <th>نوع الخدمة</th>
+              <th>اسم الزبون</th>
+              <th>المساحة / الكمية</th>
+              <th>الثمن (درهم)</th>
+              <th>الحالة</th>
+              <th>ملاحظات</th>
+              <th>إجراء</th>
+            </tr>
+          </thead>
+          <tbody id="servicesTable">
+            <tr><td colspan="9"><div class="empty-state"><div class="empty-icon">🚜</div><p>لا توجد خدمات مسجلة بعد</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== INCOME ========== -->
+  <div class="section" id="sec-income">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">💰 سجل المداخيل</div>
+        <button class="btn btn-green" onclick="openModal('modalIncome')">＋ إضافة مدخول</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>المصدر</th>
+              <th>البيان</th>
+              <th>المبلغ (درهم)</th>
+              <th>طريقة الدفع</th>
+              <th>ملاحظات</th>
+              <th>إجراء</th>
+            </tr>
+          </thead>
+          <tbody id="incomeTable">
+            <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">💰</div><p>لا توجد مداخيل مسجلة بعد</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== EXPENSES ========== -->
+  <div class="section" id="sec-expenses">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">📋 سجل المصاريف</div>
+        <button class="btn btn-gold" onclick="openModal('modalExpense')">＋ إضافة مصروف</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>الفئة</th>
+              <th>البيان</th>
+              <th>المبلغ (درهم)</th>
+              <th>المورد</th>
+              <th>طريقة الدفع</th>
+              <th>إجراء</th>
+            </tr>
+          </thead>
+          <tbody id="expensesTable">
+            <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📋</div><p>لا توجد مصاريف مسجلة بعد</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MEMBERS ========== -->
+  <div class="section" id="sec-members">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">👥 أعضاء التعاونية</div>
+        <button class="btn btn-green" onclick="openModal('modalMember')">＋ إضافة عضو</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>الاسم الكامل</th>
+              <th>الصفة</th>
+              <th>رقم الهاتف</th>
+              <th>تاريخ الانضمام</th>
+              <th>الحصص</th>
+              <th>الحالة</th>
+            </tr>
+          </thead>
+          <tbody id="membersTable">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== EQUIPMENT ========== -->
+  <div class="section" id="sec-equipment">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">⚙️ سجل المعدات والآليات</div>
+        <button class="btn btn-green" onclick="openModal('modalEquipment')">＋ إضافة معدة</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>اسم المعدة</th>
+              <th>النوع / الماركة</th>
+              <th>تاريخ الاقتناء</th>
+              <th>الثمن (درهم)</th>
+              <th>الحالة</th>
+              <th>آخر صيانة</th>
+              <th>ملاحظات</th>
+            </tr>
+          </thead>
+          <tbody id="equipTable">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end main -->
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ======== MODALS ======== -->
+
+<!-- SERVICE MODAL -->
+<div class="modal-overlay" id="modalService">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🚜 تسجيل خدمة جديدة</div>
+      <button class="modal-close" onclick="closeModal('modalService')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>التاريخ *</label>
+        <input type="date" id="sDate">
+      </div>
+      <div class="form-group">
+        <label>نوع الخدمة *</label>
+        <select id="sType">
+          <option value="">اختر...</option>
+          <option>تقليم أشجار الفواكه</option>
+          <option>حراثة</option>
+          <option>رش مبيدات</option>
+          <option>نقل محاصيل</option>
+          <option>سقي آلي</option>
+          <option>تكتيل القش (Baling)</option>
+          <option>خدمة أخرى</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>اسم الزبون *</label>
+        <input type="text" id="sClient" placeholder="الاسم الكامل">
+      </div>
+      <div class="form-group">
+        <label>المنطقة / الدوار</label>
+        <input type="text" id="sZone" placeholder="مثال: أيت طالب">
+      </div>
+      <div class="form-group">
+        <label>المساحة (هكتار) / الكمية</label>
+        <input type="text" id="sArea" placeholder="مثال: 2 هكتار">
+      </div>
+      <div class="form-group">
+        <label>الثمن المتفق عليه (درهم) *</label>
+        <input type="number" id="sPrice" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>المعدة المستعملة</label>
+        <select id="sEquip">
+          <option value="">اختر...</option>
+          <option>مقص كهربائي للتقليم</option>
+          <option>جرار Case IH JX 80</option>
+          <option>آلة تكتيل القش</option>
+          <option>آلة رش</option>
+          <option>أخرى</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>الحالة</label>
+        <select id="sStatus">
+          <option value="مجدولة">مجدولة</option>
+          <option value="جارية">جارية</option>
+          <option value="منجزة">منجزة</option>
+          <option value="ملغاة">ملغاة</option>
+        </select>
+      </div>
+      <div class="form-group" style="grid-column: 1/-1;">
+        <label>ملاحظات</label>
+        <textarea id="sNotes" rows="2" placeholder="معلومات إضافية..."></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-green" id="btnSaveService" onclick="saveService()">✔ حفظ الخدمة</button>
+      <button class="btn btn-red" onclick="closeModal('modalService')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- INCOME MODAL -->
+<div class="modal-overlay" id="modalIncome">
+  <div class="modal">
+    <div class="modal-header" style="background: linear-gradient(135deg, #1a5c1a, var(--green));">
+      <div class="modal-title">💰 تسجيل مدخول</div>
+      <button class="modal-close" onclick="closeModal('modalIncome')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>التاريخ *</label>
+        <input type="date" id="iDate">
+      </div>
+      <div class="form-group">
+        <label>مصدر المدخول *</label>
+        <select id="iSource">
+          <option value="">اختر...</option>
+          <option>خدمات فلاحية</option>
+          <option>حصص الأعضاء</option>
+          <option>دعم FDA</option>
+          <option>دعم ODECO</option>
+          <option>قرض</option>
+          <option>مداخيل أخرى</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>البيان *</label>
+        <input type="text" id="iDesc" placeholder="وصف العملية">
+      </div>
+      <div class="form-group">
+        <label>المبلغ (درهم) *</label>
+        <input type="number" id="iAmount" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>طريقة الدفع</label>
+        <select id="iMethod">
+          <option>نقداً</option>
+          <option>تحويل بنكي</option>
+          <option>شيك</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>ملاحظات</label>
+        <input type="text" id="iNotes" placeholder="...">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-green" id="btnSaveIncome" onclick="saveIncome()">✔ حفظ المدخول</button>
+      <button class="btn btn-red" onclick="closeModal('modalIncome')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXPENSE MODAL -->
+<div class="modal-overlay" id="modalExpense">
+  <div class="modal">
+    <div class="modal-header" style="background: linear-gradient(135deg, #7a1a1a, var(--red));">
+      <div class="modal-title">📋 تسجيل مصروف</div>
+      <button class="modal-close" onclick="closeModal('modalExpense')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>التاريخ *</label>
+        <input type="date" id="eDate">
+      </div>
+      <div class="form-group">
+        <label>فئة المصروف *</label>
+        <select id="eCat">
+          <option value="">اختر...</option>
+          <option>وقود ومحروقات</option>
+          <option>صيانة المعدات</option>
+          <option>أجور ويد عاملة</option>
+          <option>مستلزمات فلاحية</option>
+          <option>نقل وشحن</option>
+          <option>إدارة ومصاريف مكتبية</option>
+          <option>تأمينات</option>
+          <option>مصاريف أخرى</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>البيان *</label>
+        <input type="text" id="eDesc" placeholder="وصف المصروف">
+      </div>
+      <div class="form-group">
+        <label>المبلغ (درهم) *</label>
+        <input type="number" id="eAmount" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>المورد / الجهة</label>
+        <input type="text" id="eVendor" placeholder="اسم المورد">
+      </div>
+      <div class="form-group">
+        <label>طريقة الدفع</label>
+        <select id="eMethod">
+          <option>نقداً</option>
+          <option>تحويل بنكي</option>
+          <option>شيك</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-gold" id="btnSaveExpense" onclick="saveExpense()">✔ حفظ المصروف</button>
+      <button class="btn btn-red" onclick="closeModal('modalExpense')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- MEMBER MODAL -->
+<div class="modal-overlay" id="modalMember">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">👤 إضافة عضو</div>
+      <button class="modal-close" onclick="closeModal('modalMember')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>الاسم الكامل *</label>
+        <input type="text" id="mName" placeholder="الاسم الكامل">
+      </div>
+      <div class="form-group">
+        <label>الصفة</label>
+        <select id="mRole">
+          <option>عضو</option>
+          <option>الرئيس</option>
+          <option>نائب الرئيس</option>
+          <option>الكاتب العام</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>رقم الهاتف</label>
+        <input type="tel" id="mPhone" placeholder="06xxxxxxxx">
+      </div>
+      <div class="form-group">
+        <label>تاريخ الانضمام</label>
+        <input type="date" id="mJoin">
+      </div>
+      <div class="form-group">
+        <label>عدد الحصص</label>
+        <input type="number" id="mShares" placeholder="1" value="1">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-green" id="btnSaveMember" onclick="saveMember()">✔ حفظ</button>
+      <button class="btn btn-red" onclick="closeModal('modalMember')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- EQUIPMENT MODAL -->
+<div class="modal-overlay" id="modalEquipment">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">⚙️ إضافة معدة / آلية</div>
+      <button class="modal-close" onclick="closeModal('modalEquipment')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>اسم المعدة *</label>
+        <input type="text" id="qName" placeholder="مثال: جرار Case IH JX 80">
+      </div>
+      <div class="form-group">
+        <label>النوع / الماركة</label>
+        <input type="text" id="qBrand" placeholder="الماركة">
+      </div>
+      <div class="form-group">
+        <label>تاريخ الاقتناء</label>
+        <input type="date" id="qDate">
+      </div>
+      <div class="form-group">
+        <label>الثمن (درهم)</label>
+        <input type="number" id="qPrice" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>الحالة</label>
+        <select id="qStatus">
+          <option>صالحة للاستخدام</option>
+          <option>تحت الصيانة</option>
+          <option>معطلة</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>آخر صيانة</label>
+        <input type="date" id="qMaint">
+      </div>
+      <div class="form-group" style="grid-column:1/-1;">
+        <label>ملاحظات</label>
+        <textarea id="qNotes" rows="2" placeholder="..."></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-green" id="btnSaveEquip" onclick="saveEquipment()">✔ حفظ</button>
+      <button class="btn btn-red" onclick="closeModal('modalEquipment')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DEFAULT DATA =====
+const STORAGE_KEY = 'ihrrouken-coop-data';
+
+let data = {
+  services: [],
+  income: [],
+  expenses: [],
+  members: [
+    { name: 'سعيد الحساني', role: 'الرئيس', phone: '', join: '2020-01-01', shares: 1 },
+    { name: 'عبد الرحيم الحساني', role: 'نائب الرئيس', phone: '', join: '2020-01-01', shares: 1 },
+    { name: 'حمزة حسني', role: 'الكاتب العام', phone: '', join: '2020-01-01', shares: 1 },
+  ],
+  equipment: [
+    { name: 'جرار Case IH JX 80', brand: 'Case IH', date: '', price: 0, status: 'صالحة للاستخدام', maint: '', notes: '' },
+    { name: 'مقص كهربائي للتقليم', brand: 'STIHL', date: '', price: 0, status: 'صالحة للاستخدام', maint: '', notes: '' }
+  ]
+};
+
+// ===== STORAGE (SHARED ACROSS ALL MEMBERS) =====
+async function loadData() {
+  try {
+    const result = await window.storage.get(STORAGE_KEY, true);
+    if (result && result.value) {
+      const parsed = JSON.parse(result.value);
+      // merge with defaults to avoid missing keys on old data
+      data = Object.assign({services:[],income:[],expenses:[],members:[],equipment:[]}, parsed);
+    }
+  } catch (e) {
+    // no data yet - keep defaults
+    console.log('لا توجد بيانات محفوظة، تم استعمال البيانات الافتراضية');
+  }
+  document.getElementById('loadingOverlay').style.display = 'none';
+  render();
+}
+
+async function saveData(successMsg) {
+  try {
+    const result = await window.storage.set(STORAGE_KEY, JSON.stringify(data), true);
+    if (!result) throw new Error('فشل الحفظ');
+    if (successMsg) showToast(successMsg);
+    return true;
+  } catch (e) {
+    showToast('⚠️ تعذر الحفظ، حاول مرة أخرى');
+    console.error('Save error:', e);
+    return false;
+  }
+}
+
+async function manualSync() {
+  const btn = document.getElementById('syncBtn');
+  btn.classList.add('loading');
+  document.getElementById('syncLabel').textContent = 'جاري التحديث...';
+  try {
+    const result = await window.storage.get(STORAGE_KEY, true);
+    if (result && result.value) {
+      data = Object.assign({services:[],income:[],expenses:[],members:[],equipment:[]}, JSON.parse(result.value));
+    }
+    render();
+    showToast('✔ تم التحديث - آخر البيانات');
+  } catch (e) {
+    showToast('لا توجد تغييرات جديدة');
+  }
+  btn.classList.remove('loading');
+  document.getElementById('syncLabel').textContent = 'تحديث';
+}
+
+// ===== TOAST =====
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('show'), 2500);
+}
+
+// ===== UTILS =====
+function fmt(n) { return Number(n||0).toLocaleString('ar-MA'); }
+
+function today() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function badgeHtml(text) {
+  const map = { 'منجزة': 'green', 'جارية': 'blue', 'مجدولة': 'gold', 'ملغاة': 'red',
+                'صالحة للاستخدام': 'green', 'تحت الصيانة': 'gold', 'معطلة': 'red' };
+  return `<span class="badge badge-${map[text]||'blue'}">${text}</span>`;
+}
+
+function setBtnLoading(id, loading, label) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.textContent = loading ? '⏳ جاري الحفظ...' : label;
+}
+
+// ===== TABS =====
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ===== MODAL =====
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  const dateFields = document.querySelectorAll('#'+id+' input[type=date]');
+  dateFields.forEach(f => { if (!f.value) f.value = today(); });
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ===== SAVE FUNCTIONS =====
+async function saveService() {
+  const d = {
+    date: document.getElementById('sDate').value,
+    type: document.getElementById('sType').value,
+    client: document.getElementById('sClient').value,
+    zone: document.getElementById('sZone').value,
+    area: document.getElementById('sArea').value,
+    price: parseFloat(document.getElementById('sPrice').value)||0,
+    equip: document.getElementById('sEquip').value,
+    status: document.getElementById('sStatus').value,
+    notes: document.getElementById('sNotes').value
+  };
+  if (!d.date || !d.type || !d.client) { alert('يرجى ملء الحقول الإلزامية'); return; }
+
+  setBtnLoading('btnSaveService', true);
+  data.services.push(d);
+  if (d.status === 'منجزة' && d.price > 0) {
+    data.income.push({ date: d.date, source: 'خدمات فلاحية', desc: d.type + ' - ' + d.client, amount: d.price, method: 'نقداً', notes: '' });
+  }
+  const ok = await saveData('✔ تم حفظ الخدمة وستظهر لجميع الأعضاء');
+  setBtnLoading('btnSaveService', false, '✔ حفظ الخدمة');
+  if (!ok) { data.services.pop(); if (d.status === 'منجزة' && d.price > 0) data.income.pop(); return; }
+
+  closeModal('modalService');
+  ['sDate','sType','sClient','sZone','sArea','sPrice','sNotes'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('sStatus').value='مجدولة';
+  render();
+}
+
+async function saveIncome() {
+  const d = {
+    date: document.getElementById('iDate').value,
+    source: document.getElementById('iSource').value,
+    desc: document.getElementById('iDesc').value,
+    amount: parseFloat(document.getElementById('iAmount').value)||0,
+    method: document.getElementById('iMethod').value,
+    notes: document.getElementById('iNotes').value
+  };
+  if (!d.date || !d.amount) { alert('يرجى ملء الحقول الإلزامية'); return; }
+
+  setBtnLoading('btnSaveIncome', true);
+  data.income.push(d);
+  const ok = await saveData('✔ تم حفظ المدخول وسيظهر لجميع الأعضاء');
+  setBtnLoading('btnSaveIncome', false, '✔ حفظ المدخول');
+  if (!ok) { data.income.pop(); return; }
+
+  closeModal('modalIncome');
+  ['iDate','iSource','iDesc','iAmount','iNotes'].forEach(id => document.getElementById(id).value='');
+  render();
+}
+
+async function saveExpense() {
+  const d = {
+    date: document.getElementById('eDate').value,
+    cat: document.getElementById('eCat').value,
+    desc: document.getElementById('eDesc').value,
+    amount: parseFloat(document.getElementById('eAmount').value)||0,
+    vendor: document.getElementById('eVendor').value,
+    method: document.getElementById('eMethod').value
+  };
+  if (!d.date || !d.amount) { alert('يرجى ملء الحقول الإلزامية'); return; }
+
+  setBtnLoading('btnSaveExpense', true);
+  data.expenses.push(d);
+  const ok = await saveData('✔ تم حفظ المصروف وسيظهر لجميع الأعضاء');
+  setBtnLoading('btnSaveExpense', false, '✔ حفظ المصروف');
+  if (!ok) { data.expenses.pop(); return; }
+
+  closeModal('modalExpense');
+  ['eDate','eCat','eDesc','eAmount','eVendor'].forEach(id => document.getElementById(id).value='');
+  render();
+}
+
+async function saveMember() {
+  const d = {
+    name: document.getElementById('mName').value,
+    role: document.getElementById('mRole').value,
+    phone: document.getElementById('mPhone').value,
+    join: document.getElementById('mJoin').value,
+    shares: document.getElementById('mShares').value
+  };
+  if (!d.name) { alert('يرجى إدخال الاسم'); return; }
+
+  setBtnLoading('btnSaveMember', true);
+  data.members.push(d);
+  const ok = await saveData('✔ تم إضافة العضو');
+  setBtnLoading('btnSaveMember', false, '✔ حفظ');
+  if (!ok) { data.members.pop(); return; }
+
+  closeModal('modalMember');
+  ['mName','mPhone','mJoin','mShares'].forEach(id => document.getElementById(id).value='');
+  render();
+}
+
+async function saveEquipment() {
+  const d = {
+    name: document.getElementById('qName').value,
+    brand: document.getElementById('qBrand').value,
+    date: document.getElementById('qDate').value,
+    price: parseFloat(document.getElementById('qPrice').value)||0,
+    status: document.getElementById('qStatus').value,
+    maint: document.getElementById('qMaint').value,
+    notes: document.getElementById('qNotes').value
+  };
+  if (!d.name) { alert('يرجى إدخال اسم المعدة'); return; }
+
+  setBtnLoading('btnSaveEquip', true);
+  data.equipment.push(d);
+  const ok = await saveData('✔ تم إضافة المعدة');
+  setBtnLoading('btnSaveEquip', false, '✔ حفظ');
+  if (!ok) { data.equipment.pop(); return; }
+
+  closeModal('modalEquipment');
+  ['qName','qBrand','qDate','qPrice','qMaint','qNotes'].forEach(id => document.getElementById(id).value='');
+  render();
+}
+
+// ===== DELETE =====
+async function delService(i) {
+  if(!confirm('حذف هذه الخدمة؟ سيظهر هذا الحذف لجميع الأعضاء.')) return;
+  const removed = data.services.splice(i,1)[0];
+  const ok = await saveData('🗑 تم الحذف');
+  if (!ok) data.services.splice(i,0,removed);
+  render();
+}
+async function delIncome(i) {
+  if(!confirm('حذف هذا المدخول؟ سيظهر هذا الحذف لجميع الأعضاء.')) return;
+  const removed = data.income.splice(i,1)[0];
+  const ok = await saveData('🗑 تم الحذف');
+  if (!ok) data.income.splice(i,0,removed);
+  render();
+}
+async function delExpense(i) {
+  if(!confirm('حذف هذا المصروف؟ سيظهر هذا الحذف لجميع الأعضاء.')) return;
+  const removed = data.expenses.splice(i,1)[0];
+  const ok = await saveData('🗑 تم الحذف');
+  if (!ok) data.expenses.splice(i,0,removed);
+  render();
+}
+
+// ===== RENDER =====
+function render() {
+  const totalIncome = data.income.reduce((s,x)=>s+x.amount,0);
+  const totalExpense = data.expenses.reduce((s,x)=>s+x.amount,0);
+  const balance = totalIncome - totalExpense;
+
+  document.getElementById('kpi-income').textContent = fmt(totalIncome);
+  document.getElementById('kpi-expenses').textContent = fmt(totalExpense);
+  document.getElementById('kpi-balance').textContent = fmt(balance);
+  document.getElementById('kpi-balance').style.color = balance >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('kpi-services').textContent = data.services.length;
+
+  // Month stats
+  const thisMonth = new Date().toISOString().slice(0,7);
+  const mIncome = data.income.filter(x=>x.date&&x.date.startsWith(thisMonth)).reduce((s,x)=>s+x.amount,0);
+  const mExp = data.expenses.filter(x=>x.date&&x.date.startsWith(thisMonth)).reduce((s,x)=>s+x.amount,0);
+  const pending = data.services.filter(x=>x.status==='مجدولة'||x.status==='جارية').length;
+  document.getElementById('stat-month-income').textContent = fmt(mIncome);
+  document.getElementById('stat-month-exp').textContent = fmt(mExp);
+  document.getElementById('stat-pending').textContent = pending;
+  document.getElementById('stat-members').textContent = data.members.length;
+
+  // Recent table
+  const all = [
+    ...data.income.map(x=>({date:x.date, type:'مدخول', desc:x.desc||x.source, amount:x.amount, status:'green'})),
+    ...data.expenses.map(x=>({date:x.date, type:'مصروف', desc:x.desc||x.cat, amount:-x.amount, status:'red'})),
+    ...data.services.filter(x=>x.status==='منجزة').map(x=>({date:x.date, type:'خدمة', desc:x.type+' - '+x.client, amount:x.price, status:'blue'}))
+  ].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
+
+  const rt = document.getElementById('recentTable');
+  if (all.length === 0) {
+    rt.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📋</div><p>لا توجد عمليات بعد.</p></div></td></tr>';
+  } else {
+    rt.innerHTML = all.map(x=>`<tr>
+      <td>${x.date}</td>
+      <td><span class="badge badge-${x.status}">${x.type}</span></td>
+      <td>${x.desc}</td>
+      <td style="font-weight:700;color:${x.amount>=0?'var(--green)':'var(--red)'};">${x.amount>=0?'+':''}${fmt(Math.abs(x.amount))}</td>
+      <td>—</td>
+    </tr>`).join('');
+  }
+
+  // Expense breakdown
+  const cats = {};
+  data.expenses.forEach(x=>{ cats[x.cat||'أخرى'] = (cats[x.cat||'أخرى']||0)+x.amount; });
+  const eb = document.getElementById('expenseBreakdown');
+  if (Object.keys(cats).length === 0) {
+    eb.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><p>أضف مصاريف لعرض التوزيع</p></div>';
+  } else {
+    const maxVal = Math.max(...Object.values(cats));
+    const colors = ['var(--green)','var(--gold)','var(--blue)','var(--red)','#8e44ad','#e67e22'];
+    eb.innerHTML = Object.entries(cats).map(([k,v],i)=>`
+      <div class="prog-row">
+        <div class="prog-label">${k}</div>
+        <div class="prog-bar"><div class="prog-fill" style="width:${Math.round(v/maxVal*100)}%;background:${colors[i%colors.length]};"></div></div>
+        <div class="prog-val" style="color:${colors[i%colors.length]};">${fmt(v)} د</div>
+      </div>`).join('');
+  }
+
+  // Services table
+  const st = document.getElementById('servicesTable');
+  if (data.services.length === 0) {
+    st.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">🚜</div><p>لا توجد خدمات مسجلة بعد</p></div></td></tr>';
+  } else {
+    st.innerHTML = data.services.map((s,i)=>`<tr>
+      <td>${i+1}</td>
+      <td>${s.date}</td>
+      <td><strong>${s.type}</strong></td>
+      <td>${s.client}</td>
+      <td>${s.area||'—'}</td>
+      <td style="font-weight:700;color:var(--green);">${fmt(s.price)}</td>
+      <td>${badgeHtml(s.status)}</td>
+      <td style="font-size:12px;color:var(--gray-400);">${s.notes||'—'}</td>
+      <td><button class="btn btn-red btn-sm" onclick="delService(${i})">🗑</button></td>
+    </tr>`).join('');
+  }
+
+  // Income table
+  const it = document.getElementById('incomeTable');
+  if (data.income.length === 0) {
+    it.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">💰</div><p>لا توجد مداخيل مسجلة بعد</p></div></td></tr>';
+  } else {
+    it.innerHTML = data.income.map((x,i)=>`<tr>
+      <td>${x.date}</td>
+      <td><span class="badge badge-green">${x.source||'—'}</span></td>
+      <td>${x.desc||'—'}</td>
+      <td style="font-weight:700;color:var(--green);">+${fmt(x.amount)}</td>
+      <td>${x.method||'—'}</td>
+      <td style="font-size:12px;color:var(--gray-400);">${x.notes||'—'}</td>
+      <td><button class="btn btn-red btn-sm" onclick="delIncome(${i})">🗑</button></td>
+    </tr>`).join('');
+  }
+
+  // Expenses table
+  const et = document.getElementById('expensesTable');
+  if (data.expenses.length === 0) {
+    et.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📋</div><p>لا توجد مصاريف مسجلة بعد</p></div></td></tr>';
+  } else {
+    et.innerHTML = data.expenses.map((x,i)=>`<tr>
+      <td>${x.date}</td>
+      <td><span class="badge badge-gold">${x.cat||'—'}</span></td>
+      <td>${x.desc||'—'}</td>
+      <td style="font-weight:700;color:var(--red);">-${fmt(x.amount)}</td>
+      <td>${x.vendor||'—'}</td>
+      <td>${x.method||'—'}</td>
+      <td><button class="btn btn-red btn-sm" onclick="delExpense(${i})">🗑</button></td>
+    </tr>`).join('');
+  }
+
+  // Members table
+  document.getElementById('membersTable').innerHTML = data.members.map((m,i)=>`<tr>
+    <td>${i+1}</td>
+    <td><strong>${m.name}</strong></td>
+    <td><span class="badge badge-green">${m.role}</span></td>
+    <td>${m.phone||'—'}</td>
+    <td>${m.join||'—'}</td>
+    <td>${m.shares||1}</td>
+    <td><span class="badge badge-green">نشيط</span></td>
+  </tr>`).join('');
+
+  // Equipment table
+  document.getElementById('equipTable').innerHTML = data.equipment.map((e,i)=>`<tr>
+    <td>${i+1}</td>
+    <td><strong>${e.name}</strong></td>
+    <td>${e.brand||'—'}</td>
+    <td>${e.date||'—'}</td>
+    <td style="font-weight:700;">${fmt(e.price)}</td>
+    <td>${badgeHtml(e.status||'صالحة للاستخدام')}</td>
+    <td>${e.maint||'—'}</td>
+    <td style="font-size:12px;color:var(--gray-400);">${e.notes||'—'}</td>
+  </tr>`).join('');
+}
+
+// Header date
+document.getElementById('headerDate').textContent = new Date().toLocaleDateString('ar-MA', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+// initial load
+loadData();
+</script>
+</body>
+</html>
